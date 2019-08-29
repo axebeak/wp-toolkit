@@ -1,0 +1,245 @@
+body {
+    background-color: #2A363B;
+    color: #FF847C;
+    font-family: 'Share Tech', sans-serif;
+}
+
+nav a {
+    color: #E84A5F;
+    font-size: 23px;
+    text-decoration: none;
+}
+
+nav a:hover {
+    color: #14B2A1;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+.active-menu-item {
+    color: #14B2A1;
+}
+
+ul {
+    list-style-type: none;
+    padding-left:10px;
+    padding-top:10px;
+}
+
+li {
+    color: #FECEA8;
+}
+
+input[type=text],input[type=email],input[type=password] {
+	background: none;
+	color: #FECEA8;
+	font-weight: bold;
+	padding: 5px 5px 5px 5px;
+	border: none;
+	border-radius: 0;
+	border-bottom: 1px solid #FECEA8;
+    font-family: 'Share Tech', sans-serif !important;
+}
+
+button {
+	color: #FECEA8;
+	background-color: transparent;
+	border-color: #FECEA8 !important;
+	min-width:100px;
+    font-family: 'Share Tech', sans-serif !important;
+}
+
+button:hover {
+    color: #2A363B;
+    background-color: #FECEA8;
+}
+
+select {
+    -webkit-appearance: none; 
+    -moz-appearance: none;
+    appearance: none;
+	background-color: inherit;
+	color: inherit;
+	border: none;
+	border-bottom: 1px solid #FECEA8;
+}
+
+select option {
+    background-color: #2A363B;
+}
+
+#app{
+    display: none;
+}
+
+.login-row {
+    height: 15rem;
+}
+
+.login-form {
+    border: 1px solid #FECEA8;
+    border-radius: .25rem;
+    padding: 30px;
+}
+
+.response-loading {
+    min-height: 50px;
+    margin-bottom: 1rem;
+}
+
+.main-input {
+    min-width: 300px;
+    text-align: center;
+}
+
+.menu-bar {
+  background-color: #14B2A1;
+  width:50px;
+  height:1px;
+  position: relative;
+  bottom: 4px;
+}
+
+.selector {
+    color: #FECEA8;
+    position: relative;
+    font-family: 'Share Tech', sans-serif;
+}
+
+.selector:after {
+    font-family: "Font Awesome 5 Free";
+    content:"\f152";
+    transform: rotate(0.25turn);
+    font-size: 11px;
+    color: #FECEA8;
+    right:5px; 
+    top:4px;
+    padding:0 0 2px;
+    position:absolute;
+    pointer-events:none;
+    
+}
+.selector:before {
+    content:'';
+    right:4px; top:0px;
+    width:23px; height:18px;
+    background: inherit;
+    position:absolute;
+    pointer-events:none;
+    display:block;
+}
+
+.box {
+    border: 1px solid #FECEA8;
+    border-radius: .25rem;
+    padding:5px;
+    height:450px;
+    width:350px;
+    overflow-y:auto; 
+}
+
+.box-padding {
+    padding-right: 15px !important;
+}
+.ver-input {
+    max-width:55px !important;
+    display:inline;
+}
+
+.custom-control-input:focus ~ .custom-control-label::before {
+    box-shadow:none !important;
+}
+
+.custom-control-label:before{
+  background-color:#FECEA8;
+}
+
+.custom-checkbox .custom-control-input:checked~.custom-control-label::before{
+  background-color:#14B2A1;
+}
+
+.custom-radio .custom-control-input:checked~.custom-control-label::before{
+  background-color:#14B2A1;
+}
+
+.selected {
+    color: #14B2A1 !important;
+    border-color: #14B2A1 !important;
+}
+
+.alert, label {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.theme-button {
+    min-width: 210px;
+}
+
+.reupload-button {
+    min-width: 145px;
+}
+
+.theme-button-container {
+    padding-top: 120px;
+}
+
+.ml-59 {
+    margin-left: 5.9rem !important;
+}
+
+.text-wrap {
+    width: 140px;
+}
+
+.latest-checkbox {
+    float: right;
+    margin-top: 4px;
+}
+
+.userinfo {
+    width: 380px;
+    border: 1px solid #FECEA8;
+    border-radius: .25rem;
+    text-align: center;
+	color: #FECEA8;
+	min-height: 500px;
+	max-height: 750px;
+	font-size: 16px;
+    font-family: 'Open Sans', sans-serif;
+    margin-top: 6px;
+}
+
+.user-list {
+	border: 1px solid #FECEA8;
+	border-radius: .25rem;
+	padding: 5px;
+	width: 100%;
+	overflow-y: auto;
+	text-align: center;
+	height: 250px;
+}
+
+.userinfo-row {
+    margin-top: 15px;
+    display: block;
+    width: 100%;
+}
+
+.user-menu-item:hover, .user-item:hover {
+    color: #14B2A1;
+}
+
+.user-item {
+    color: inherit;
+}
+
+.input-userinfo {
+    width: 172px;
+}
+
+.level-name {
+    display: inline-block;
+    min-width: 100px;
+}

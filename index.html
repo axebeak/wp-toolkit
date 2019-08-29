@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>WordPress Toolkit</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/loading.css">
+  <link href="https://fonts.googleapis.com/css?family=Share+Tech" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+</head>
+<body>
+  <noscript>Please enable JavaScript to proceed.</noscript>
+  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+  <div id="app" class="container">
+    <div v-if="loggedIn">
+    <div v-if="database && !multisite">
+      <header class="mb-3">
+        <nav class="row navbar d-flex text-center">
+          <a href="javascript:void(0)" @click="fetch('main')" id="main" class="active-menu-item menu-item">Main</a>
+          <a href="javascript:void(0)" @click="fetch('plugins')" id="plugins" class="menu-item">Plugins</a>
+          <a href="javascript:void(0)" @click="fetch('themes')" id="themes" class="menu-item">Themes</a>
+          <a href="javascript:void(0)" @click="fetch('users')" id="users" class="menu-item">Users</a>
+          <a href="javascript:void(0)" @click="fetch('versions')" id="versions" class="menu-item">Files</a>
+        </nav>
+        <div class="menu-bar"></div>
+      </header>
+    
+    <div v-if="menu.isActive">
+        <div class="alert alert-warning" v-if="!toolkitVer">Warning! Your version of WordPress Toolkit is outdated. Please update it.</div>
+        <div class="alert alert-warning" v-if="!fopen">Warning! allow_url_fopen is disabled in PHP configuration. Some functions will not be available.</div>
+        <div class="response-loading d-flex justify-content-center" v-if="loadingResponse">
+            <div class="dots">
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+        </div>
+        <div class="alert" :class="alertColor()" v-else>
+            <div>
+                {{ message ? message : 'Please select an action below' }}
+            </div>
+        </div>
+            <div v-if="menu.main">
+                <mainmenu
+                    :home="data.home"
+                    :siteurl="data.siteurl"
+                    :title="data.title"
+                    :desc="data.desc"
+                >
+                </mainmenu>
+            </div>
+            <div v-if="menu.plugins" class="mb-4">
+                <div class="row">
+                    <div class="col">
+                        <div>
+                            <h3  class="text-center">Active Plugins:</h3>
+                            <div  class="d-flex justify-content-center">
+                                <plugins
+                                    :list="data.active"
+                                    :status="'active'"
+                                >
+                                </plugins>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h3 class="text-center">Inactive Plugins:</h3>
+                        <div  class="d-flex justify-content-center">
+                            <plugins
+                                :list="data.inactive"
+                                :status="'inactive'"
+                            >
+                            </plugins>
+                        </div>
+                    </div>
+                </div>
+                <div class="row  d-flex text-center mt-4">
+                    <div class="mx-auto">
+                        <button class="btn" @click="revert('plugins')">Revert</button>
+                        <button class="btn" @click="undo('plugins')">Undo</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4" v-if="menu.themes">
+                <div class="col">
+                    <themes
+                        :themes="data.themes"
+                        :stylesheet="data.stylesheet"
+                        :template="data.template"
+                    >
+                    </themes>
+                    <div class="d-flex text-center mt-3 justify-content-center">
+                        <button class="btn mr-4" @click="revert('themes')">Revert</button>
+                        <button class="btn ml-4" @click="undo('themes')">Undo</button>
+                    </div>
+                </div>
+                <div class="col theme-button-container" v-if="!defaultThemeSelected">
+                    <div class="row mb-4"><button class="btn theme-button" form="theme-form" name="theme" @click="setTheme()">Change Theme</button></div>
+                    <div class="row mb-4"><button class="btn theme-button" form="theme-form" name="stylesheet" @click="setStylesheet()">Set as stylesheet</button></div>
+                    <div class="row mb-4"><button class="btn theme-button" form="theme-form" name="template" @click="setTemplate()">Set as template</button></div>
+                    <div class="row mb-4"><button class="btn theme-button"  @click="removeThemes('themes')">Remove</button></div>
+                </div>
+                <div class="col theme-button-container" v-else>
+                    <div class="row mb-4"><button class="btn theme-button" :disabled="!fopen" @click="reuploadDefaultTheme(false)">Reupload</button></div>
+                    <div class="row mb-4"><button class="btn theme-button" :disabled="!fopen" @click="reuploadDefaultTheme(true)">Reupload and set as a theme</button></div>
+                </div>
+            </div>
+            <div v-if="menu.users">
+                <nav class="row d-flex text-center ml-2">
+                    <a href="javascript:void(0)" @click="userOpen('userList')" class="user-menu-item mr-2" :class="users.userList ? 'selected' : ''">User List</a>
+                    <a href="javascript:void(0)" @click="userOpen('newUser')" class="user-menu-item mr-2 ml-2" :class="users.newUser ? 'selected' : ''">Create New User</a>
+                    <a href="javascript:void(0)" @click="userOpen('roles')"  class="user-menu-item ml-2" :class="users.roles ? 'selected' : ''">User Roles</a>
+                </nav>
+                <div class="row" :class="users.roles ? 'ml-3' : 'justify-content-center'">
+                    <div v-if="users.userList" class="col-sm-4">
+                        <div class="d-flex flex-column justify-content-center">
+                            <input class="text-center mb-4" type="text" placeholder="Search user" v-model="userSearch">
+                            <users
+                                :users="usersResult()"
+                            >
+                            </users>
+                        </div>
+                    </div>
+                    <div class="col" v-if="users.userList">
+                        <div class="d-flex justify-content-center">
+                            <userinfo
+                                :info="userinfo"
+                                :levels="data.levels"
+                                v-if="userinfoOpened" 
+                            >
+                            </userinfo>
+                        </div>
+                    </div>
+                    <newuser
+                        v-if="users.newUser"
+                        :levels="data.levels"
+                        class="col-sm-4 text-center mt-4"
+                    >
+                    </newuser>
+                    <div v-if="users.roles">
+                        <button class="btn theme-button mt-3" @click="restoreDefaultRoles()">Restore Default Roles</button>
+                        <roles
+                            :roles="data.roles"
+                            class="mt-4"
+                        >
+                        </roles>
+                    </div>
+                </div>
+            </div>
+            <div v-if="menu.versions" class="mb-4">
+                <div class="row  ml-59">
+                    <button class="btn ml-1 mr-1 mt-2 theme-button" :disabled="!fopen" @click="reuploadDefault()">Reupload Core Files</button>
+                    <button class="btn ml-1 mr-1 mt-2 theme-button" v-if="data['old-files']" @click="removeOldFiles()">Remove Old Files</button>
+                    <button class="btn ml-1 mr-1 mt-2 theme-button" v-if="data['cache-folder']" @click="cacheFolder('remove')">Remove Cache Folder</button>
+                    <button class="btn ml-1 mr-1 mt-2 theme-button" v-if="data['cache-folder']" @click="cacheFolder('disable')">Disable Cache Folder</button>
+                    <button class="btn ml-1 mr-1 mt-2 theme-button" v-if="data['cache-folder-dis']" @click="cacheFolder('enable')">Enable Cache Folder</button>
+                    <button class="btn ml-1 mr-1 mt-2 theme-button" v-if="data['tc-config']" @click="totalCacheFolder('remove')">Remove Total Cache Config</button>
+                    <button class="btn ml-1 mr-1 mt-2 theme-button" v-if="data['tc-config']" @click="totalCacheFolder('disable')">Disable Total Cache Config</button>
+                    <button class="btn ml-1 mr-1 mt-2 theme-button" v-if="data['tc-config-dis']" @click="totalCacheFolder('enable')">Enable Total Cache Config</button>
+                </div>
+                <div class="row mt-4 d-flex justify-content-center">
+                    <div class="col">
+                        <h3 class="text-center">Plugins:</h3>
+                        <div class="d-flex justify-content-center">
+                            <reupload
+                                :list="data.plugins"
+                                :status="'plugins'"
+                            >
+                            </reupload>
+                        </div>
+                        <div class="row  d-flex text-center justify-content-center mt-2">
+                            <button class="btn reupload-button mr-4" :disabled="!fopen" @click="reupload('plugins')">Reupload Plugins</button>
+                            <button  class="btn reupload-button ml-4" @click="removePlugins('reupload')">Remove</button>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h3 class="text-center">Themes:</h3>
+                        <div class="d-flex justify-content-center">
+                            <reupload
+                                :list="data.themes"
+                                :status="'themes'"
+                            >
+                            </reupload>
+                        </div>
+                        <div class="row  d-flex text-center justify-content-center mt-2">
+                            <button class="btn reupload-button mr-4" :disabled="!fopen" @click="reupload('themes')">Reupload Themes</button>
+                            <button class="btn reupload-button ml-4" @click="removeThemes('reupload')">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <div v-if="loading" class="lds-ring"><div></div><div></div><div></div><div></div></div>
+   </div>
+   <div v-else>
+       <div class="container row">
+           <div class="col"></div>
+           <div class="col-lg-6">
+               <div v-if="startup">
+                   <div v-if="multisite">
+                       <div class="alert alert-danger">Error! Unfortunately, Multisite is not supported yet.</div>
+                   </div>
+                   <dberror
+                    :error="databaseError"
+                    v-if="!database"
+                   ></dberror>
+               </div>
+               <button class="btn btn-block mt-5" @click="selfDestruct()">Delete WordPress Toolkit</button>
+           </div>
+           <div class="col"></div>
+       </div>
+   </div>
+  </div>
+  <div v-else>
+        <div class="row login-row">
+            <div class="col"></div>
+            <div class="col">
+               <button class="btn btn-block mt-5" @click="selfDestruct()">Delete WordPress Toolkit</button>
+            </div>
+            <div class="col"></div>
+        </div>
+        <div class="row">
+            <div class="col"></div>
+            <div class="col d-flex flex-column justify-content-center login-form">
+                <div class="alert mb-3" :class="loginMessageColor() ? 'alert-info' : 'alert-danger'">{{ loginMessage === '' ? 'Please enter the password to access WordPress Toolkit.' : loginMessage }}</div>
+                <h3 class="text-center mb-4">Login</h3>
+                <input class="mb-4 text-center" type="password" v-model="toolkitPassword" placeholder="Password">
+                <button class="btn btn-block" @click="login()">Submit</button>
+            </div>
+            <div class="col"></div>
+        </div>
+  </div>
+  </div>
+  <script
+			  src="https://code.jquery.com/jquery-3.4.1.min.js"
+			  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			  crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script type="text/javascript" src="assets/js/frontend.js"></script>
+  <script type="text/javascript" src="assets/js/other.js"></script>
+</body>
